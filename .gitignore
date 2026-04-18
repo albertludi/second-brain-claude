@@ -1,0 +1,4 @@
+config.sh
+*.log
+graphify-needs-rebuild.flag
+.DS_Store

@@ -1,0 +1,39 @@
+{
+  "_comment": "Add these hook entries to your ~/.claude/settings.json hooks section. Replace YOUR_MEMORY_DIR with your actual memory path (same as MEMORY_DIR in config.sh).",
+
+  "Stop": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "MEMORY_DIR=\"YOUR_MEMORY_DIR\"; GRAPH=\"$MEMORY_DIR/graphify-out/graph.json\"; FLAG=\"$HOME/.claude/graphify-needs-rebuild.flag\"; if [ -f \"$GRAPH\" ] && find \"$MEMORY_DIR\" -maxdepth 1 -name \"*.md\" -newer \"$GRAPH\" | grep -q .; then touch \"$FLAG\"; fi"
+        }
+      ]
+    }
+  ],
+
+  "SessionStart": [
+    {
+      "matcher": "",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "[ -f $HOME/.claude/graphify-needs-rebuild.flag ] && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Memory graph is stale — new memory files added since last graphify run. Consider running /graphify on your memory folder this session.\"}}' || true"
+        }
+      ]
+    }
+  ],
+
+  "PreToolUse": [
+    {
+      "matcher": "Glob|Grep",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "[ -f graphify-out/graph.json ] && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"additionalContext\":\"graphify: Knowledge graph exists. Read graphify-out/GRAPH_REPORT.md for community structure before searching raw files.\"}}' || true"
+        }
+      ]
+    }
+  ]
+}
