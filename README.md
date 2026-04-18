@@ -72,8 +72,8 @@ You never edit these files by hand. If something is wrong, tell Claude — it wi
 
 | Time                | Job                                                 |
 | ------------------- | --------------------------------------------------- |
-| Sunday 02:00        | Headless graph rebuild (`claude -p /graphify`)      |
-| Sunday 02:30        | Sync graph output to Obsidian vault                 |
+| Sunday 00:00 UTC    | Headless graph rebuild (`claude -p /graphify`)      |
+| Sunday 00:30 UTC    | Sync graph output to Obsidian vault                 |
 | Every session end   | Stop hook checks if memory changed since last build |
 | Every session start | If stale, Claude is reminded to rebuild             |
 
