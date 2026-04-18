@@ -25,16 +25,10 @@ Claude writes plain markdown notes as you work. A graph builder reads those note
 ## Does it help?
 
 <p align="center">
-  <img src="docs/images/chart_scaling.png" alt="token cost vs memory size" width="100%">
+  <img src="docs/images/infographic.png" alt="token savings infographic" width="100%">
 </p>
 
-<p align="center">
-  <img src="docs/images/chart_scenarios.png" alt="reduction ratio by query type" width="100%">
-</p>
-
-Across 12 representative queries (1,000 bootstrap resamples), the system used **6.76× fewer tokens** on average — a 95% CI of 5.33× to 8.48×. The naive approach loads every memory file on every query, so its cost grows linearly; the graph approach grows sublinearly and pulls ahead as the vault gets larger.
-
-At a typical workload of 5 sessions per week, 8 queries per session, the saving is around **517,600 tokens per month**.
+Across 12 representative queries (1,000 bootstrap resamples), the system used **6.76× fewer tokens** on average — 95% CI: 5.33× to 8.48×. The naive approach loads every file on every query; the graph traversal loads only what's relevant. The gap widens as memory grows.
 
 ---
 
