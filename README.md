@@ -28,7 +28,19 @@ Claude writes plain markdown notes as you work. A graph builder reads those note
   <img src="docs/images/infographic.png" alt="token savings infographic" width="100%">
 </p>
 
-Across 12 representative queries (1,000 bootstrap resamples), the system used **6.76× fewer tokens** on average — 95% CI: 5.33× to 8.48×. The naive approach loads every file on every query; the graph traversal loads only what's relevant. The gap widens as memory grows.
+On average, queries use **6.76× fewer tokens** — because the graph loads only what's relevant instead of reading every file. The gap widens as your memory grows: at 50 files, the saving is 14.6×. Across a typical month that adds up to ~517,000 tokens not spent.
+
+*(Measured on 12 representative queries, 1,000 bootstrap resamples. 95% CI: 5.33× – 8.48×.)*
+
+---
+
+## Requirements
+
+- [Claude Code](https://claude.ai/code) CLI installed
+- [graphify](https://github.com/graphify-ai/graphify) installed in a Python virtual env (`pip install graphify`)
+- Python 3.10+
+- macOS or Linux (cron-based automation)
+- An Obsidian vault — optional, for visual graph browsing
 
 ---
 
@@ -40,24 +52,17 @@ cd second-brain-claude
 ./install.sh
 ```
 
-> One manual step: open `~/.claude/CLAUDE.md` and add the line shown by the installer. This tells Claude to read its memory at session start.
+The installer asks for your memory folder path, Obsidian destination, and binary locations, then writes a `config.sh` (gitignored) and optionally adds cron jobs.
 
----
-
-## Requirements
-
-- Claude Code
-- Python 3.10+
-- macOS or Linux
-- An Obsidian vault (optional, for visual browsing)
+After install, add the hooks from `hooks/claude-settings-additions.json` to your `~/.claude/settings.json`. This enables the Stop hook (detects stale graph) and the SessionStart hook (reminds Claude to rebuild).
 
 ---
 
 ## How memory files work
 
-While you work, Claude writes short markdown notes to `~/.claude/memory/` — one note per fact, preference, or project detail. Filenames are typed (`user_*`, `project_*`, `reference_*`, `feedback_*`) so they're easy to scan.
+While you work, Claude writes short markdown notes to your Claude Code project memory folder — one note per fact, preference, or project detail. The actual path looks like `~/.claude/projects/YOUR-PROJECT-HASH/memory/`. Run `ls ~/.claude/projects/` to find it.
 
-At the start of every session, Claude reads an index of those notes. It does not load all of them. It loads what it needs, when it needs it, guided by the graph.
+Filenames are typed (`user_*`, `project_*`, `reference_*`, `feedback_*`) so they're easy to scan. At session start, Claude reads an index of those notes and loads what's relevant, guided by the graph.
 
 You never edit these files by hand. If something is wrong, tell Claude — it will rewrite the relevant note.
 
@@ -65,12 +70,12 @@ You never edit these files by hand. If something is wrong, tell Claude — it wi
 
 ## Weekly automation
 
-| Time                | Job                                                  |
-| ------------------- | ---------------------------------------------------- |
-| Sunday 02:00        | Headless graph rebuild (`claude -p /graphify`)       |
-| Sunday 02:30        | Sync graph output to Obsidian vault                  |
-| Every session end   | Stop hook checks if memory changed since last build  |
-| Every session start | If stale, Claude is reminded to rebuild              |
+| Time                | Job                                                 |
+| ------------------- | --------------------------------------------------- |
+| Sunday 02:00        | Headless graph rebuild (`claude -p /graphify`)      |
+| Sunday 02:30        | Sync graph output to Obsidian vault                 |
+| Every session end   | Stop hook checks if memory changed since last build |
+| Every session start | If stale, Claude is reminded to rebuild             |
 
 ---
 
@@ -89,8 +94,7 @@ second-brain-claude/
 │   └── images/
 │       ├── banner.png
 │       ├── diagram.png
-│       ├── chart_scaling.png
-│       └── chart_scenarios.png
+│       └── infographic.png
 ├── .gitignore
 └── LICENSE
 ```
