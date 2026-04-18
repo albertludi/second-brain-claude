@@ -1,125 +1,107 @@
-# second-brain-claude
-
 <p align="center">
-  <img src="docs/images/banner.png" alt="second-brain-claude banner" width="100%">
+  <img src="docs/images/banner.png" alt="second-brain-claude" width="100%">
 </p>
 
-A lightweight "second brain" system for [Claude Code](https://claude.ai/code) that gives Claude persistent, relational memory across sessions — without any external services.
+### Claude Code that remembers you.
+
+Every new Claude session starts blank. You re-explain your tools, your style, your projects — every time. The cost compounds: tokens, attention, and the small fatigue of being a stranger to your own assistant.
+
+`second-brain-claude` gives Claude a memory that persists.
+It learns once, recalls everything, and keeps itself organised.
+You stop repeating yourself.
+
+---
 
 ## How it works
 
 <p align="center">
-  <img src="docs/images/diagram.png" alt="System architecture diagram" width="100%">
+  <img src="docs/images/diagram.png" alt="architecture diagram" width="100%">
 </p>
 
-Three layers:
+Claude writes plain markdown notes as you work. A graph builder reads those notes and maps how the ideas connect, then mirrors the result to your Obsidian vault for browsing.
 
-```
-Claude Code session
-  → Claude writes memory files (automatic, reactive)
+---
 
-You run /graphify on memory folder (periodic, manual)
-  → builds knowledge graph: how memories relate
+## Does it help?
 
-Sunday cron
-  → syncs graph output to Obsidian vault (automatic)
+<p align="center">
+  <img src="docs/images/chart_scaling.png" alt="token cost vs memory size" width="100%">
+</p>
 
-Next session
-  → Claude reads both flat memories + relational graph
-  → stale-graph reminder fires if new files added since last /graphify
-```
+<p align="center">
+  <img src="docs/images/chart_scenarios.png" alt="reduction ratio by query type" width="100%">
+</p>
 
-**Layer 1 — Memory files**: Claude quietly writes `.md` files during sessions when it learns something worth keeping (preferences, project facts, feedback). These are read at session start.
+Across 12 representative queries (1,000 bootstrap resamples), the system used **6.76× fewer tokens** on average — a 95% CI of 5.33× to 8.48×. The naive approach loads every memory file on every query, so its cost grows linearly; the graph approach grows sublinearly and pulls ahead as the vault gets larger.
 
-**Layer 2 — Graphify**: Reads all memory files and builds a knowledge graph showing cross-connections. The output `GRAPH_REPORT.md` is also loaded at session start, giving Claude the relational map, not just isolated facts.
+At a typical workload of 5 sessions per week, 8 queries per session, the saving is around **517,600 tokens per month**.
 
-**Layer 3 — Obsidian sync**: Weekly cron copies the graph output to your Obsidian vault so you can browse it visually.
+---
 
-## Requirements
-
-- [Claude Code](https://claude.ai/code) CLI installed
-- [graphify](https://github.com/graphify-ai/graphify) installed in a Python virtual env
-- Obsidian (optional — for the visual graph browser)
-- macOS or Linux (cron-based)
-
-## Installation
+## Get started
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/second-brain-claude
+git clone https://github.com/albertludi/second-brain-claude
 cd second-brain-claude
-chmod +x install.sh
 ./install.sh
 ```
 
-The installer will:
-1. Ask for your memory folder, Obsidian paths, and binary locations
-2. Write a `config.sh` (gitignored — contains your personal paths)
-3. Optionally add Sunday cron jobs
+> One manual step: open `~/.claude/CLAUDE.md` and add the line shown by the installer. This tells Claude to read its memory at session start.
 
-## Manual step: add hooks to Claude Code
+---
 
-After running `install.sh`, add the hooks from `hooks/claude-settings-additions.json` to your `~/.claude/settings.json`. These enable:
+## Requirements
 
-- **Stop hook**: detects when memory files have changed since the last graph build → sets a flag
-- **SessionStart hook**: if flag is set, reminds Claude that the memory graph is stale
-- **PreToolUse hook**: when searching files, hints Claude to check `GRAPH_REPORT.md` first
+- Claude Code
+- Python 3.10+
+- macOS or Linux
+- An Obsidian vault (optional, for visual browsing)
 
-See `hooks/claude-settings-additions.json` for the exact JSON. Replace `YOUR_MEMORY_DIR` with your actual memory folder path.
+---
 
-## First run
+## How memory files work
 
-After setup, build the initial graph:
+While you work, Claude writes short markdown notes to `~/.claude/memory/` — one note per fact, preference, or project detail. Filenames are typed (`user_*`, `project_*`, `reference_*`, `feedback_*`) so they're easy to scan.
 
-1. Open Claude Code in any session
-2. Run: `/graphify /path/to/your/memory/folder`
-3. Claude builds `graphify-out/graph.json`, `graph.html`, `GRAPH_REPORT.md`
+At the start of every session, Claude reads an index of those notes. It does not load all of them. It loads what it needs, when it needs it, guided by the graph.
 
-From then on, the Sunday cron syncs the graph to Obsidian, and the Stop hook flags when a rebuild is needed.
+You never edit these files by hand. If something is wrong, tell Claude — it will rewrite the relevant note.
+
+---
 
 ## Weekly automation
 
-The cron schedule (set by `install.sh`):
+| Time                | Job                                                  |
+| ------------------- | ---------------------------------------------------- |
+| Sunday 02:00        | Headless graph rebuild (`claude -p /graphify`)       |
+| Sunday 02:30        | Sync graph output to Obsidian vault                  |
+| Every session end   | Stop hook checks if memory changed since last build  |
+| Every session start | If stale, Claude is reminded to rebuild              |
 
-| Time (UTC) | Job |
-|---|---|
-| Sunday 00:00 | Auto-rebuild: if flagged, run `claude -p` to rebuild graph, then sync to Obsidian |
-| Sunday 00:30 | Research graph sync to Obsidian |
-
-> **Note**: The `claude -p` headless rebuild requires Claude Code auth to be valid at cron time. If it fails, the flag stays set and you'll see a reminder at the next session start. Run `/graphify` manually if needed.
+---
 
 ## File structure
 
 ```
 second-brain-claude/
-├── install.sh                          # interactive setup
-├── config.example.sh                   # template — copy to config.sh
-├── config.sh                           # your paths (gitignored)
+├── install.sh                           # interactive setup
+├── config.example.sh                    # template — copy to config.sh
+├── hooks/
+│   └── claude-settings-additions.json  # hook config for settings.json
 ├── scripts/
 │   ├── graphify_auto_rebuild.sh        # weekly rebuild + Obsidian sync
 │   └── graphify_research_update.sh     # research graph sync
-├── hooks/
-│   └── claude-settings-additions.json  # hook config for settings.json
-├── LICENSE                             # MIT
-└── README.md
+├── docs/
+│   └── images/
+│       ├── banner.png
+│       ├── diagram.png
+│       ├── chart_scaling.png
+│       └── chart_scenarios.png
+├── .gitignore
+└── LICENSE
 ```
 
-## How memory files work
-
-Claude Code has a built-in auto-memory system. When Claude learns something during a session — a preference, a project fact, feedback — it writes a small `.md` file to your project's memory folder. You don't need to do anything. The memory folder is typically at:
-
-```
-~/.claude/projects/YOUR-PROJECT-HASH/memory/
-```
-
-To find it: `ls ~/.claude/projects/`
-
-## MEMORY.md index
-
-The memory folder should contain a `MEMORY.md` index file that Claude reads to know which files to load. After running `/graphify`, add an entry for `graphify-out/GRAPH_REPORT.md` so Claude also reads the relational synthesis:
-
-```markdown
-| [graphify-out/GRAPH_REPORT.md](graphify-out/GRAPH_REPORT.md) | reference | Relational graph of all memory files — community hubs, cross-connections. Rebuild via `/graphify`. |
-```
+---
 
 ## License
 
