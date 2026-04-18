@@ -1,8 +1,16 @@
 # second-brain-claude
 
+<p align="center">
+  <img src="docs/images/banner.png" alt="second-brain-claude banner" width="100%">
+</p>
+
 A lightweight "second brain" system for [Claude Code](https://claude.ai/code) that gives Claude persistent, relational memory across sessions — without any external services.
 
 ## How it works
+
+<p align="center">
+  <img src="docs/images/diagram.png" alt="System architecture diagram" width="100%">
+</p>
 
 Three layers:
 
