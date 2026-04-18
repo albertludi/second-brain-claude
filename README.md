@@ -25,7 +25,7 @@ Claude writes plain markdown notes as you work. A graph builder reads those note
 ## Does it help?
 
 <p align="center">
-  <img src="docs/images/infographic.png" alt="token savings infographic" width="100%">
+  <img src="docs/images/infographic_v2.png" alt="token savings infographic" width="100%">
 </p>
 
 On average, queries use **6.76× fewer tokens** — because the graph loads only what's relevant instead of reading every file. The gap widens as your memory grows: at 50 files, the saving is 14.6×. Across a typical month that adds up to ~517,000 tokens not spent.
