@@ -48,36 +48,36 @@ def color_for_ratio(r: float) -> str:
 # Data
 # ---------------------------------------------------------------------------
 PER_QUERY = [
-    ("project_overview", 2.50),
-    ("writing_feedback", 3.11),
-    ("multi_file_analysis", 4.00),
-    ("gravity_model_spec", 5.20),
-    ("network_analysis_q", 6.00),
-    ("git_workflow", 6.50),
-    ("latex_compilation", 7.00),
-    ("paper_structure", 7.50),
-    ("stata_package_query", 8.00),
-    ("reference_did_syntax", 9.00),
-    ("tool_lookup", 10.50),
-    ("style_preferences", 12.00),
+    ("r_did_vs_stata", 2.98),
+    ("active_research_projects", 4.32),
+    ("paper_writing_style", 6.84),
+    ("file_storage_locations", 7.41),
+    ("writing_style_sentence", 9.94),
+    ("stata_did_packages", 11.61),
+    ("csdid_syntax", 11.70),
+    ("mode_empirical_arch", 13.79),
+    ("stata_visualization", 14.08),
+    ("python_did_packages", 18.59),
+    ("git_workflow", 20.32),
+    ("tool_stack", 21.93),
 ]
 
 SCALING = [
-    (10, 6.8),
-    (20, 8.8),
-    (30, 10.0),
-    (50, 11.5),
-    (75, 12.7),
-    (100, 13.6),
+    (11, 11.96),
+    (20, 15.6),
+    (30, 17.7),
+    (50, 20.3),
+    (75, 22.4),
+    (100, 23.9),
 ]
 
-MEAN_RATIO = 6.78
-CI_LOW = 5.27
-CI_HIGH = 8.39
+MEAN_RATIO = 11.96
+CI_LOW = 8.61
+CI_HIGH = 15.34
 N_QUERIES = 12
 N_BOOTSTRAP = 1000
-MONTHLY_TOKENS_TEXT = "~1.49M tokens saved per month"
-MONTHLY_SUB = "(5 queries/day \u00d7 30 days, ~10,500 tokens avg)"
+MONTHLY_TOKENS_TEXT = "~0.84M tokens saved per month"
+MONTHLY_SUB = "(5 queries/day \u00d7 30 days, chars/4 token proxy)"
 REPRO_FOOT = "Reproduce: python3 scripts/bootstrap_token_analysis.py"
 
 OUT_PATH = "/tmp/second-brain-clone/docs/images/infographic_v3.png"
@@ -287,12 +287,12 @@ def panel_scaling(ax) -> None:
         zorder=3,
     )
 
-    # Dashed vertical line at the current measurement point (x=10)
-    ax.axvline(10, color=MUTED, linestyle="--", linewidth=1.3, alpha=0.8, zorder=1)
+    # Dashed vertical line at the current measurement point (x=11)
+    ax.axvline(11, color=MUTED, linestyle="--", linewidth=1.3, alpha=0.8, zorder=1)
     ax.text(
-        10,
+        11,
         ys.max() * 1.02,
-        "current (10 files)",
+        "current (11 files)",
         rotation=90,
         color=MUTED,
         fontsize=11,

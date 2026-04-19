@@ -13,35 +13,58 @@ We then bootstrapped 1,000 resamples from the 12 per-query ratios to estimate
 the mean savings and a 95% confidence interval.
 
 Reported results (README):
-  Mean savings: 6.76x   95% CI: 5.33x - 8.48x
+  Mean savings: 11.96x   95% CI: 8.61x - 15.34x
 
-Query selection covers the main task types in a research session:
-  broad context loads (low savings), targeted lookups (high savings), and
-  mixed-scope tasks in between.
+Data source: REAL measurements from actual memory files.
+Token counts = file size in characters / 4 (standard GPT-family approximation).
+tokens_without = all 11 memory files loaded (6,096 tokens total).
+tokens_with    = only the files the graph routes each query to.
+Query-to-file mapping derived from graphify community structure
+(see graphify-out/GRAPH_REPORT.md, built 2026-04-13).
 
-To reproduce with your own data: replace MEASUREMENTS below and re-run.
+See scripts/measure_token_savings.py for the live version (reads files directly).
 """
 
 import numpy as np
 
-# ── Raw measurements ──────────────────────────────────────────────────────────
+# ── Real measurements (chars/4 token counts from actual memory files) ─────────
 # Each row: (query_label, tokens_without_graph, tokens_with_graph)
-# Variance in savings reflects query scope: broad queries load more graph nodes,
-# narrowing the relative benefit; targeted lookups load 1-2 nodes, maximising it.
+# tokens_without is always 6096 (all 11 files).
+# tokens_with = sum of chars/4 for the files the graph routes to.
 
 MEASUREMENTS = [
-    ("project_overview", 9500, 3800),  # 2.5x — broad; loads most of the graph
-    ("writing_feedback", 11200, 3600),  # 3.1x — broad; many style/project nodes
-    ("multi_file_analysis", 13600, 3400),  # 4.0x — several reference clusters
-    ("gravity_model_spec", 10400, 2000),  # 5.2x — moderate scope
-    ("network_analysis_q", 12000, 2000),  # 6.0x — moderate scope
-    ("git_workflow", 13000, 2000),  # 6.5x — moderate scope
-    ("latex_compilation", 14000, 2000),  # 7.0x — moderate scope
-    ("paper_structure", 12000, 1600),  # 7.5x — narrowing to writing nodes
-    ("stata_package_query", 12800, 1600),  # 8.0x — specific reference node
-    ("reference_did_syntax", 9000, 1000),  # 9.0x — single reference node
-    ("tool_lookup", 10500, 1000),  # 10.5x — single preference node
-    ("style_preferences", 12000, 1000),  # 12.0x — 1-2 nodes only
+    (
+        "active_research_projects",
+        6096,
+        1412,
+    ),  # 4.32x — 3 files: user + literature + index
+    ("writing_style_sentence", 6096, 613),  # 9.94x — 1 file: writing_style_guide
+    ("stata_did_packages", 6096, 525),  # 11.61x — 1 file: reference_stata_did_packages
+    ("csdid_syntax", 6096, 521),  # 11.70x — 1 file: reference_stata_did_examples
+    ("file_storage_locations", 6096, 823),  # 7.41x — 2 files: MEMORY + user_profile
+    (
+        "r_did_vs_stata",
+        6096,
+        2047,
+    ),  # 2.98x — 2 files: r_did + stata_did (cross-community)
+    ("git_workflow", 6096, 300),  # 20.32x — 1 file: feedback_git_workflow
+    (
+        "python_did_packages",
+        6096,
+        328,
+    ),  # 18.59x — 1 file: reference_python_did_packages
+    (
+        "stata_visualization",
+        6096,
+        433,
+    ),  # 14.08x — 1 file: reference_stata_visualization
+    (
+        "mode_empirical_architecture",
+        6096,
+        442,
+    ),  # 13.79x — 1 file: project_mode_architecture
+    ("tool_stack", 6096, 278),  # 21.93x — 1 file: user_profile
+    ("paper_writing_style", 6096, 891),  # 6.84x — 2 files: writing_style + user_profile
 ]
 
 # ── Compute per-query savings ratios ─────────────────────────────────────────
@@ -82,7 +105,7 @@ print()
 # Naive loading is O(n_files); graph traversal stays bounded by subgraph size.
 # Projection: savings(n) = mean_ratio * log(n) / log(n_baseline)
 
-N_BASELINE = 10  # approx file count at measurement time
+N_BASELINE = 11  # actual file count at measurement time
 FILE_COUNTS = [10, 20, 30, 50, 75, 100]
 
 print("Projected savings vs. memory size")

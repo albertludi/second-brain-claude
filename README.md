@@ -28,9 +28,9 @@ Claude writes plain markdown notes as you work. A graph builder reads those note
   <img src="docs/images/infographic_v3.png" alt="token savings infographic" width="100%">
 </p>
 
-On average, queries use **6.78× fewer tokens** — because the graph loads only what's relevant instead of reading every file. The gap widens as your memory grows: at 50 files, the saving is 11.5×. Across a typical month (5 queries/day) that adds up to ~1.49M tokens not spent.
+On average, queries use **11.96× fewer tokens** — because the graph loads only what's relevant instead of reading every file. The gap widens as your memory grows: at 50 files, the saving is 20.3×. Across a typical month (5 queries/day) that adds up to ~0.84M tokens not spent.
 
-*(Measured on 12 representative queries, 1,000 bootstrap resamples. 95% CI: 5.27× – 8.39×. See [`scripts/bootstrap_token_analysis.py`](scripts/bootstrap_token_analysis.py) to reproduce.)*
+*(Measured on 12 real queries against actual memory files. Token count = chars/4. 1,000 bootstrap resamples. 95% CI: 8.61× – 15.34×. See [`scripts/measure_token_savings.py`](scripts/measure_token_savings.py) to reproduce.)*
 
 ---
 
