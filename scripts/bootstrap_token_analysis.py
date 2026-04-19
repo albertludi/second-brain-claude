@@ -94,7 +94,7 @@ print()
 
 # ── Monthly token estimate ────────────────────────────────────────────────────
 
-QUERIES_PER_DAY = 30
+QUERIES_PER_DAY = 5  # adjust to your typical session cadence
 DAYS_PER_MONTH = 30
 AVG_TOKENS_NAIVE = without.mean()
 
