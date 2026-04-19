@@ -20,6 +20,12 @@ You stop repeating yourself.
 
 Claude writes plain markdown notes as you work. A graph builder reads those notes and maps how the ideas connect, then mirrors the result to your Obsidian vault for browsing.
 
+Here is what a real memory graph looks like after a few weeks of use — each node is a memory file, each edge is a semantic connection, and colours group related communities:
+
+<p align="center">
+  <img src="docs/images/graph_example.png" alt="example memory knowledge graph" width="100%">
+</p>
+
 ---
 
 ## Does it help?
