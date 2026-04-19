@@ -18,7 +18,7 @@ Query-to-file mapping is derived from the graphify community structure
 in the relevant community hub, matching what the graph would load at runtime.
 
 Run:
-    python3 scripts/measure_token_savings.py --memory-dir ~/.claude/projects/-Users-albertludi/memory
+    python3 scripts/measure_token_savings.py --memory-dir ~/.claude/projects/YOUR-PROJECT/memory
 """
 
 import argparse
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--memory-dir",
-        default=os.path.expanduser("~/.claude/projects/-Users-albertludi/memory"),
+        default=os.path.expanduser("~/.claude/projects/YOUR-PROJECT/memory"),
     )
     args = parser.parse_args()
     run_experiment(Path(os.path.expanduser(args.memory_dir)))
